@@ -18,9 +18,11 @@ class FilmeController {
       });
       return res.status(200).json(filmes);
     } catch (error) {
+      const mensagem =
+        error instanceof Error ? error.message : 'Erro desconhecido';
       return res
         .status(500)
-        .json({ erro: 'Erro ao listar filmes.', detalhe: error.message });
+        .json({ erro: 'Erro ao listar filmes.', detalhe: mensagem });
     }
   }
   static async show(req, res) {
