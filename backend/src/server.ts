@@ -27,12 +27,18 @@ async function main() {
     await sequelize.authenticate();
     console.log('Conexao com o banco de dados estabelecida com sucesso.');
 
+    await sequelize.sync();
+    console.log('Tabelas sincronizadas.');
+
     app.listen(PORT, () => {
-      console.log(`Servidor rodando em http://localhost:${PORT}`);
+      console.log(`Servidor rodando na porta ${PORT}`);
     });
   } catch (error) {
-    console.error('Erro ao conectar com o banco de dados:', error);
+    console.error('Erro ao iniciar a aplicacao:', error);
+    process.exit(1);
   }
 }
 
 main();
+
+
