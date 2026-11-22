@@ -1,31 +1,27 @@
-# backend/Dockerfile
-# 1. Define a imagem de origem base 
-FROM node:24-alpine
-
-# 2. Configura o diretorio global do pnpm fora do volume /app para evitar conflitos
-ENV PNPM_HOME="/root/.local/share/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-
-# 3. Define diretório de trabalho interno do container
+# ---------- Estagio 1: build (compila TypeScript) ----------
+FROM node:24-alpine AS build
 WORKDIR /app
+RUN npm install -g pnpm@11
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN pnpm install --frozen-lockfile
+COPY tsconfig.json ./
+COPY src ./src
+RUN pnpm run build
 
-# 4. Instalar o pnpm globalmente para gerenciar as dependências
-RUN npm install -g pnpm
+# ---------- Estagio 2: apenas dependencias de producao ----------
+FROM node:24-alpine AS deps
+WORKDIR /app
+RUN npm install -g pnpm@11
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN pnpm install --frozen-lockfile --prod
 
-# Desativa a restrição de scripts de build do pnpm 11
-RUN pnpm config set strict-dep-builds false
-
-# 5. Copia apenas o manifesto de dependências
+# ---------- Estagio 3: imagem final ----------
+FROM node:24-alpine AS production
+ENV NODE_ENV=production
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=build /app/dist ./dist
 COPY package.json ./
-
-# 6. Instalar as dependências do projeto
-RUN pnpm install
-
-# 7. Copia todo o restante do código
-COPY . .
-
-# 8. Expõe a porta padrão LDW
+USER node
 EXPOSE 3000
-
-# 9. Comando para inicializar a aplicação
-CMD ["pnpm", "dev"]
+CMD ["node", "dist/server.js"]
