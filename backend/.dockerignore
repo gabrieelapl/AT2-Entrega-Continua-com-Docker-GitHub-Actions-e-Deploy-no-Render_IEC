@@ -1,7 +1,16 @@
 node_modules
 dist
-npm-debug.log
 .git
 .github
+.husky
+.env
+.env.*
+!.env.example
+*.log
+coverage
+tests
+__tests__
+**/*.test.ts
+**/*.spec.ts
 Dockerfile
 .dockerignore
