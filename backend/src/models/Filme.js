@@ -40,3 +40,12 @@ Filme.init(
     timestamps: true,
   },
 );
+
+
+
+
+hostname dpg-dc1jhd68bjmc73cm67a0-a
+port 5432
+databse catalogo_filmes_db_02e7
+user catalogo_filmes_db_02e7_user
+password ON8gEujNUJJ24zNCq0XVJcuaTOFCa802
